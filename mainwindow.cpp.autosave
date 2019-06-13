@@ -22,10 +22,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     dataBase.openDefaultDB();
-
-
     /* Finish at the end */showTableView("");
-//    /* Finish at the end */refreshTreeWidget();
+    /* Finish at the end */refreshTreeWidget();
+
+
 
 
 }
