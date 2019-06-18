@@ -15,13 +15,12 @@ public:
                   const QString &user, const QString &passwd, int port = -1);
     void addConnection(QString databaseName);
     bool openDefaultDataBase();
-    bool openNewDB();
+    bool openNewDataBase();
     /* Finish at the end */ void closeDB() { closeDataBase(); }
 
 private:
     bool closeDataBase();
-    bool setQuery();
-    bool setNewQuery();
+    bool setDefaultQuery();
 
 };
 

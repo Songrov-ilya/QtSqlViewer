@@ -44,10 +44,11 @@ bool DataBase::openDefaultDataBase()
 {
     /* Finish at the end  создавать новый файл, в том случае если он не существует. А так, открывать существующий*/
     addConnection("DataNameDefault");
-    setQuery();
+    setDefaultQuery();
+
 }
 
-bool DataBase::openNewDB()
+bool DataBase::openNewDataBase()
 {
     closeDataBase();
     addConnection("DataNameFull");
@@ -65,7 +66,7 @@ bool DataBase::closeDataBase()
     qDebug() << "Text close 22 " << endl;
 }
 
-bool DataBase::setQuery()
+bool DataBase::setDefaultQuery()
 {
     QSqlQuery query;
     query.exec("create table person (id INTEGER primary key AUTOINCREMENT, "
@@ -75,28 +76,10 @@ bool DataBase::setQuery()
     query.exec("insert into person (name, age) values ('Lars', 35)");
     query.exec("insert into person (name, age) values ('Roberto', 36)");
     query.exec("insert into person (name, age) values ('Maria', 36)");
+    query.exec("SELECT * from person");
 
+//    query.exec("create table person (id INTEGER primary key AUTOINCREMENT, name TEXT (20), age INTEGER)");
+//    query.exec("SELECT name from person");
 
     return true;
-
-}
-
-bool DataBase::setNewQuery()
-{
-    QSqlQuery q("");
-    q.exec("drop table Movies");
-    q.exec("drop table Names");
-    q.exec("create table Movies (id integer primary key, Title varchar, Director varchar, Rating number)");
-    q.exec("insert into Movies values (0, 'Metropolis', 'Fritz Lang', '8.4')");
-    q.exec("insert into Movies values (1, 'Nosferatu, eine Symphonie des Grauens', 'F.W. Murnau', '8.1')");
-    q.exec("insert into Movies values (2, 'Bis ans Ende der Welt', 'Wim Wenders', '6.5')");
-    q.exec("insert into Movies values (3, 'Hardware', 'Richard Stanley', '5.2')");
-    q.exec("insert into Movies values (4, 'Mitchell', 'Andrew V. McLaglen', '2.1')");
-    q.exec("create table Names (id integer primary key, name varchar, age varchar, City varchar)");
-    q.exec("insert into Names values (0, 'Sala', 'Palmer', 'Morristown')");
-    q.exec("insert into Names values (1, 'Christopher', 'Walker', 'Morristown')");
-    q.exec("insert into Names values (2, 'Donald', 'Duck', 'Andeby')");
-    q.exec("insert into Names values (3, 'Buck', 'Rogers', 'Paris')");
-    q.exec("insert into Names values (4, 'Sherlock', 'Holmes', 'London')");
-    return q.isSelect();
 }
