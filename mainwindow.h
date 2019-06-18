@@ -13,12 +13,12 @@ class MainWindow : public QMainWindow
 
     QTreeWidget *treeWidget;
     QTableView *tableView;
-    QLineEdit *lineEditName;
-    QLabel *labelName;
     QLineEdit *lineEditAge;
     QLabel *labelAge;
-    QPushButton *pushButtonClear;
     QPushButton *pushButtonEdit;
+
+    QAction *actionInsertRow;
+    QAction *actionDeleteRow;
 
     DataBase dataBase;
 
@@ -26,19 +26,25 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void setupActions();
+    void setupMenuBar();
     void setupWidgets();
-
-public slots:
-    void onActionOpenDB();
-    void onActionactionAboutApp();
+    void setupConnections();
 
 
 private:
-    void initializeModel(QSqlTableModel *model);
-    QTableView *createView(QTableView * view, QSqlTableModel *model, const QString &title = "");
-    void showTableView(const QString &table);
+    void showTableView(const int row);
     void refreshTreeWidget();
+
+public slots:
+    void onActionOpenDB();
+    void onActionMakeQuery();
+    void onActionactionAboutApp();
+    void slotShowTable(const QModelIndex &index) { showTableView (index.row()); }
+    void slotOnPushButtonEdit();
+
+private slots:
+    void slotActionInsertRow();
+    void slotActionDeleteRow();
 
 
 };

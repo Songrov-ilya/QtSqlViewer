@@ -10,41 +10,45 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     treeWidget { new QTreeWidget },
     tableView { new QTableView },
-    lineEditName { new QLineEdit},
-    labelName { new QLabel("Name")},
-    lineEditAge { new QLineEdit},
-    labelAge { new QLabel("Age")},
-    pushButtonClear { new QPushButton("Clear line") },
-    pushButtonEdit { new QPushButton("Edit") }
+    pushButtonEdit { new QPushButton("Edit") },
+    actionInsertRow  { new QAction("InsertRow", tableView) },
+    actionDeleteRow  { new QAction("DeleteRow", tableView) }
 {
-    setupActions();
+    setupMenuBar();
     setupWidgets();
+    setupConnections();
 
 
-    dataBase.openDefaultDB();
+    dataBase.openDefaultDataBase();
+    showTableView(0);
+    refreshTreeWidget();
 
 
-    /* Finish at the end */showTableView("");
-//    /* Finish at the end */refreshTreeWidget();
 
 
 }
 
 MainWindow::~MainWindow()
 {
+    /* Finish at the end */dataBase.closeDB();
+    /* Finish at the end */qDebug() << "Text remove " << QFile("DataNameDefault").remove() << endl;
+
 
 }
 
-void MainWindow::setupActions()
+void MainWindow::setupMenuBar()
 {
     QMenuBar *menuBar { new QMenuBar(this) };
     QMenu *menuFile { new QMenu("File", menuBar) };
-    QAction *actionOpenDB { new QAction("Open DB", menuFile) };
+    QAction *actionOpenDB { new QAction("Open DataBase", menuFile) };
+    QAction *actionMakeQuery { new QAction("Make Query", menuFile) };
     QAction *actionQuit { new QAction("Quit", menuFile) };
     menuFile->addAction(actionOpenDB);
+    menuFile->addAction(actionMakeQuery);
     menuFile->addAction(actionQuit);
 
     connect(actionOpenDB, &QAction::triggered, this, &MainWindow::onActionOpenDB);
+    connect(actionMakeQuery, &QAction::triggered, this, &MainWindow::onActionMakeQuery);
     connect(actionQuit, &QAction::triggered, this, &MainWindow::close);
 
     QMenu *menuHelp { new QMenu("Help", this) };
@@ -65,28 +69,40 @@ void MainWindow::setupWidgets()
 {
     QWidget *widget { new QWidget };
 
-    QHBoxLayout *hLayoutLine { new QHBoxLayout};
     QHBoxLayout *hLayoutButton { new QHBoxLayout};
-    hLayoutLine->addWidget(lineEditName);
-    hLayoutLine->addWidget(labelName);
-    hLayoutLine->addWidget(lineEditAge);
-    hLayoutLine->addWidget(labelAge);
-    hLayoutButton->addWidget(pushButtonClear);
-    hLayoutButton->addWidget(pushButtonEdit);
+    hLayoutButton->addWidget(pushButtonEdit, 1, Qt::AlignRight);
 
     QGridLayout *mainLayout { new QGridLayout};
     mainLayout->addWidget(treeWidget, 0, 0, 3, 1);
     treeWidget->setHeaderHidden(true);
     mainLayout->addWidget(tableView, 0, 1);
-    mainLayout->addLayout(hLayoutLine, 1, 1);
-    mainLayout->addLayout(hLayoutButton, 2, 1);
+        mainLayout->addLayout(hLayoutButton, 2, 1);
     widget->setLayout(mainLayout);
     setCentralWidget(widget);
+
+    tableView->addAction(actionInsertRow);
+    tableView->addAction(actionDeleteRow);
+    tableView->setContextMenuPolicy(Qt::ContextMenuPolicy::ActionsContextMenu);
+}
+
+void MainWindow::setupConnections()
+{
+    connect(treeWidget, &QTreeWidget::activated, this, &MainWindow::slotShowTable);
+
+    connect(actionInsertRow, &QAction::triggered, this, &MainWindow::slotActionInsertRow);
+    connect(actionDeleteRow, &QAction::triggered, this, &MainWindow::slotActionDeleteRow);
+
+    connect(pushButtonEdit, &QPushButton::clicked, this, &MainWindow::slotOnPushButtonEdit);
 }
 
 void MainWindow::onActionOpenDB()
 {
     dataBase.openNewDB();
+}
+
+void MainWindow::onActionMakeQuery()
+{
+
 }
 
 void MainWindow::onActionactionAboutApp()
@@ -95,40 +111,63 @@ void MainWindow::onActionactionAboutApp()
 }
 
 
-void MainWindow::initializeModel(QSqlTableModel *model)
+void MainWindow::slotOnPushButtonEdit()
 {
-    model->setTable("person");
+    QSqlTableModel *model = qobject_cast<QSqlTableModel *>(tableView->model());
+    if (!model) {
+        return;
+    }
+
+    QString strMessage { "Error: "};
+
+    if(!model->submitAll()){
+        strMessage.append(model->lastError().text() + "\n");
+        QMessageBox msgBox;
+        msgBox.setText(strMessage);
+        msgBox.exec();
+    }
+
+}
+
+void MainWindow::slotActionInsertRow()
+{
+    QSqlTableModel *model = qobject_cast<QSqlTableModel *>(tableView->model());
+    if (!model)
+        return;
+
+    QModelIndex insertModelIndex = tableView->currentIndex();
+    int row = insertModelIndex.row() == -1 ? 0 : insertModelIndex.row();
+    model->insertRow(row);
+    insertModelIndex = model->index(row, 0);
+    tableView->setCurrentIndex(insertModelIndex);
+    tableView->edit(insertModelIndex);
+}
+
+void MainWindow::slotActionDeleteRow()
+{
+    QSqlTableModel *model = qobject_cast<QSqlTableModel *>(tableView->model());
+    if (!model)
+        return;
+
+    QModelIndex deleteModelIndex = tableView->currentIndex();
+    model->removeRow(deleteModelIndex.row());
+
+}
+
+
+
+void MainWindow::showTableView(const int row)
+{
+    QSqlTableModel *model = new CustomModelMy(tableView, QSqlDatabase::database());
+
     model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    model->setTable(QSqlDatabase::database().tables().at(row));
     model->select();
-
-//    model->setHeaderData(0, Qt::Horizontal, QObject::tr("ID"));
-//    model->setHeaderData(1, Qt::Horizontal, QObject::tr("First name"));
-//    model->setHeaderData(2, Qt::Horizontal, QObject::tr("Last name"));
-}
-
-QTableView *MainWindow::createView(QTableView * view, QSqlTableModel *model, const QString &title)
-{
-    view->setModel(model);
-    view->setWindowTitle(title);
-    return view;
-}
-
-void MainWindow::showTableView(const QString &table)
-{
-    qDebug() << "showTable 2" << endl;
-    QSqlTableModel *model = new QSqlTableModel(tableView, QSqlDatabase::database());
-    model->setEditStrategy(QSqlTableModel::OnRowChange);
-//    model->setTable(QSqlDatabase::database().driver()->escapeIdentifier(table, QSqlDriver::TableName));
-    model->setTable(QSqlDatabase::database().tables().at(0));
-    model->select();
-//    if (model->lastError().type() != QSqlError::NoError)
-//        emit statusMessage(model->lastError().text());
 
     tableView->setModel(model);
-    tableView->setEditTriggers(QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed);
-//    connect(table->selectionModel(), &QItemSelectionModel::currentRowChanged,
-//            this, &Browser::currentChanged);
-
+/* Finish at the end *///    tableView->setColumnHidden(0,true);
+    tableView->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::EditKeyPressed);
+    tableView->itemDelegateForColumn(1);
 
 }
 

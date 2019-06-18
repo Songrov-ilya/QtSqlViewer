@@ -40,7 +40,7 @@ void DataBase::addConnection(QString databaseName)
     }
 }
 
-bool DataBase::openDefaultDB()
+bool DataBase::openDefaultDataBase()
 {
     /* Finish at the end  создавать новый файл, в том случае если он не существует. А так, открывать существующий*/
     addConnection("DataNameDefault");
@@ -49,12 +49,12 @@ bool DataBase::openDefaultDB()
 
 bool DataBase::openNewDB()
 {
-    closeDB();
+    closeDataBase();
     addConnection("DataNameFull");
 }
 
 
-bool DataBase::closeDB()
+bool DataBase::closeDataBase()
 {
     qDebug() << "Text close -11 " << endl;
     QString strDb = QSqlDatabase::database().connectionName();
@@ -68,49 +68,14 @@ bool DataBase::closeDB()
 bool DataBase::setQuery()
 {
     QSqlQuery query;
-    query.exec("create table person (id int primary key, "
-               "firstname varchar(20), lastname varchar(20))");
-    query.exec("insert into person values(101, 'Danny', 'Young')");
-    query.exec("insert into person values(102, 'Christine', 'Holand')");
-    query.exec("insert into person values(103, 'Lars', 'Gordon')");
-    query.exec("insert into person values(104, 'Roberto', 'Robitaille')");
-    query.exec("insert into person values(105, 'Maria', 'Papadopoulos')");
+    query.exec("create table person (id INTEGER primary key AUTOINCREMENT, "
+               "name TEXT (20), age INTEGER)");
+    query.exec("insert into person (name, age) values ('Danny', 23)");
+    query.exec("insert into person (name, age) values ('Christine', 34)");
+    query.exec("insert into person (name, age) values ('Lars', 35)");
+    query.exec("insert into person (name, age) values ('Roberto', 36)");
+    query.exec("insert into person (name, age) values ('Maria', 36)");
 
-
-    query.exec("create table items (id int primary key,"
-                                             "imagefile int,"
-                                             "itemtype varchar(20),"
-                                             "description varchar(100))");
-    query.exec("insert into items "
-               "values(0, 0, 'Qt',"
-               "'Qt is a full development framework with tools designed to "
-               "streamline the creation of stunning applications and  "
-               "amazing user interfaces for desktop, embedded and mobile "
-               "platforms.')");
-    query.exec("insert into items "
-               "values(1, 1, 'Qt Quick',"
-               "'Qt Quick is a collection of techniques designed to help "
-               "developers create intuitive, modern-looking, and fluid "
-               "user interfaces using a CSS & JavaScript like language.')");
-    query.exec("insert into items "
-               "values(2, 2, 'Qt Creator',"
-               "'Qt Creator is a powerful cross-platform integrated "
-               "development environment (IDE), including UI design tools "
-               "and on-device debugging.')");
-    query.exec("insert into items "
-               "values(3, 3, 'Qt Project',"
-               "'The Qt Project governs the open source development of Qt, "
-               "allowing anyone wanting to contribute to join the effort "
-               "through a meritocratic structure of approvers and "
-               "maintainers.')");
-
-    query.exec("create table images (itemid int, file varchar(20))");
-    query.exec("insert into images values(0, 'images/qt-logo.png')");
-    query.exec("insert into images values(1, 'images/qt-quick.png')");
-    query.exec("insert into images values(2, 'images/qt-creator.png')");
-    query.exec("insert into images values(3, 'images/qt-project.png')");
-
-    qDebug() << "Text " << endl;
 
     return true;
 
@@ -127,7 +92,7 @@ bool DataBase::setNewQuery()
     q.exec("insert into Movies values (2, 'Bis ans Ende der Welt', 'Wim Wenders', '6.5')");
     q.exec("insert into Movies values (3, 'Hardware', 'Richard Stanley', '5.2')");
     q.exec("insert into Movies values (4, 'Mitchell', 'Andrew V. McLaglen', '2.1')");
-    q.exec("create table Names (id integer primary key, Firstname varchar, Lastname varchar, City varchar)");
+    q.exec("create table Names (id integer primary key, name varchar, age varchar, City varchar)");
     q.exec("insert into Names values (0, 'Sala', 'Palmer', 'Morristown')");
     q.exec("insert into Names values (1, 'Christopher', 'Walker', 'Morristown')");
     q.exec("insert into Names values (2, 'Donald', 'Duck', 'Andeby')");
