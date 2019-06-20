@@ -26,47 +26,48 @@ QSqlError DataBase::addConnection(const QString &driver, const QString &dbName, 
         db = QSqlDatabase();
         QSqlDatabase::removeDatabase(QString("DataName%1").arg(cCount));
     }
-//    connectionWidget->refresh();
 
     return err;
 }
 
-void DataBase::addConnection(QString databaseName)
+bool DataBase::addConnection(QString databaseName)
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName(databaseName);
     if (!db.open()) {
         qWarning("Failed to open DataName.");
+        return false;
     }
+    return true;
 }
 
 bool DataBase::openDefaultDataBase()
 {
     /* Finish at the end  создавать новый файл, в том случае если он не существует. А так, открывать существующий*/
-    addConnection("DataNameDefault");
+    bool boolOpen { addConnection("DataNameDefault") };
     setDefaultQuery();
 
+    return boolOpen;
 }
 
 bool DataBase::openNewDataBase()
 {
-    closeDataBase();
-    addConnection("DataNameFull");
+    ConnectionDialog connDialog;
+    connDialog.exec();
+//    closeDataBase();
+//    bool boolOpen { addConnection("DataNameFull") };
+//    return boolOpen;
 }
 
 
-bool DataBase::closeDataBase()
+void DataBase::closeDataBase()
 {
-    qDebug() << "Text close -11 " << endl;
     QString strDb = QSqlDatabase::database().connectionName();
-    qDebug() << "Text close 11 " << strDb << endl;
     QSqlDatabase::database(strDb).close();
     QSqlDatabase::removeDatabase(strDb);
-
-    qDebug() << "Text close 22 " << endl;
 }
 
-bool DataBase::setDefaultQuery()
+void DataBase::setDefaultQuery()
 {
     QSqlQuery query;
     query.exec("create table person (id INTEGER primary key AUTOINCREMENT, "
@@ -76,10 +77,4 @@ bool DataBase::setDefaultQuery()
     query.exec("insert into person (name, age) values ('Lars', 35)");
     query.exec("insert into person (name, age) values ('Roberto', 36)");
     query.exec("insert into person (name, age) values ('Maria', 36)");
-    query.exec("SELECT * from person");
-
-//    query.exec("create table person (id INTEGER primary key AUTOINCREMENT, name TEXT (20), age INTEGER)");
-//    query.exec("SELECT name from person");
-
-    return true;
 }

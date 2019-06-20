@@ -115,9 +115,7 @@ void MainWindow::onActionMakeQuery()
     {
         QSqlQueryModel *model = new QSqlQueryModel(this->tableView);
         model->setQuery(QSqlQuery(textEdit.toPlainText()));
-        if(model){
         this->tableView->setModel(model);
-        }
         this->refreshTreeWidget();
 
         if(model->lastError().type() != QSqlError::NoError){

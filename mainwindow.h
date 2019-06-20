@@ -7,6 +7,7 @@
 
 #include "DataBase.h"
 
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT

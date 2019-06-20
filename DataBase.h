@@ -6,6 +6,9 @@
 #include <QColor>
 #include <QBrush>
 
+
+#include "ConnectionDialog.h"
+
 class DataBase
 {
 public:
@@ -13,14 +16,14 @@ public:
 
     QSqlError addConnection(const QString &driver, const QString &dbName, const QString &host,
                   const QString &user, const QString &passwd, int port = -1);
-    void addConnection(QString databaseName);
+    bool addConnection(QString databaseName);
     bool openDefaultDataBase();
     bool openNewDataBase();
     /* Finish at the end */ void closeDB() { closeDataBase(); }
 
 private:
-    bool closeDataBase();
-    bool setDefaultQuery();
+    void closeDataBase();
+    void setDefaultQuery();
 
 };
 
