@@ -23,7 +23,7 @@ void ConnectionDialog::setWidgets()
     editDatabase->addAction(actionPoints, QLineEdit::TrailingPosition);
     connect(actionPoints, &QAction::triggered, [&]()
     {
-        QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "/home");
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QDir::currentPath());
         editDatabase->setText(fileName);
     });
     textLabeDatabaseName = new QLabel("Database Name:", connectionGroupBox);

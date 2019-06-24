@@ -26,7 +26,6 @@ QSqlError DataBase::addConnection(const QString &driver, const QString &dbName, 
         db = QSqlDatabase();
         QSqlDatabase::removeDatabase(QString("DataName%1").arg(cCount));
     }
-    qDebug() << "Text db.open(user, passwd) "  << db.databaseName() << endl;
 
     return err;
 }
@@ -44,7 +43,6 @@ bool DataBase::addConnection(QString databaseName)
 
 bool DataBase::openDefaultDataBase()
 {
-    /* Finish at the end  создавать новый файл, в том случае если он не существует. А так, открывать существующий*/
     bool boolOpen { addConnection("DataNameDefault") };
     setDefaultQuery();
 
@@ -58,11 +56,8 @@ bool DataBase::openNewDataBase()
     ConnectionDialog connDialog;
     if(connDialog.exec() == QDialog::Accepted)
     {
-        QSqlError err;
-        qDebug() << "Text openNewDataBase" << connDialog.driverName()<< connDialog.databaseName()<< connDialog.hostName()<<
-                connDialog.userName()<< connDialog.password()<< connDialog.port() << endl;
-
-        err = addConnection(connDialog.driverName(), connDialog.databaseName(), connDialog.hostName(),
+        closeDataBase();
+        QSqlError err = addConnection(connDialog.driverName(), connDialog.databaseName(), connDialog.hostName(),
                       connDialog.userName(), connDialog.password(), connDialog.port());
         if (err.type() != QSqlError::NoError) {
             QMessageBox::warning(&connDialog, QObject::tr("Unable to open database"),
@@ -85,7 +80,10 @@ void DataBase::closeDataBase()
 void DataBase::setDefaultQuery()
 {
     QSqlQuery query;
-    query.exec("create table person (id INTEGER primary key AUTOINCREMENT, "
+    query.exec("DROP table sqlite_sequence");
+    query.exec("DROP table person");
+    query.exec("Truncate table person");
+    query.exec("create table if not exists person (id INTEGER primary key AUTOINCREMENT, "
                "name TEXT (20), age INTEGER)");
     query.exec("insert into person (name, age) values ('Ilya', 24)");
     query.exec("insert into person (name, age) values ('Yarik', 21)");

@@ -27,9 +27,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    /* Finish at the end */dataBase.closeDataBase();
-    /* Finish at the end */qDebug() << "Text remove " << QFile("DataNameDefault").remove() << endl;
-
 
 }
 
@@ -94,8 +91,9 @@ void MainWindow::setupConnections()
 
 void MainWindow::onActionOpenDB()
 {
-    dataBase.closeDataBase();
-    dataBase.openNewDataBase();
+    if(!dataBase.openNewDataBase()){
+        return;
+    }
     showTableView(0);
     refreshTreeWidget();
 }
@@ -135,7 +133,14 @@ void MainWindow::onActionMakeQuery()
 
 void MainWindow::onActionactionAboutApp()
 {
-
+    QDialog dialog;
+    QLabel label;
+    label.setText("It is application for viewing and editing databases. It also possible to create "
+                  "tables and make queries.");
+    QVBoxLayout lay;
+    lay.addWidget(&label);
+    dialog.setLayout(&lay);
+    dialog.exec();
 }
 
 
