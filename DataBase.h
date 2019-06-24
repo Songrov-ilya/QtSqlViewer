@@ -19,10 +19,9 @@ public:
     bool addConnection(QString databaseName);
     bool openDefaultDataBase();
     bool openNewDataBase();
-    /* Finish at the end */ void closeDB() { closeDataBase(); }
+    void closeDataBase();
 
 private:
-    void closeDataBase();
     void setDefaultQuery();
 
 };

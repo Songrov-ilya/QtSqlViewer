@@ -23,14 +23,11 @@ MainWindow::MainWindow(QWidget *parent) :
     showTableView(0);
     refreshTreeWidget();
 
-
-
-
 }
 
 MainWindow::~MainWindow()
 {
-    /* Finish at the end */dataBase.closeDB();
+    /* Finish at the end */dataBase.closeDataBase();
     /* Finish at the end */qDebug() << "Text remove " << QFile("DataNameDefault").remove() << endl;
 
 
@@ -97,7 +94,10 @@ void MainWindow::setupConnections()
 
 void MainWindow::onActionOpenDB()
 {
+    dataBase.closeDataBase();
     dataBase.openNewDataBase();
+    showTableView(0);
+    refreshTreeWidget();
 }
 
 void MainWindow::onActionMakeQuery()
@@ -186,10 +186,18 @@ void MainWindow::slotActionDeleteRow()
 
 void MainWindow::showTableView(const int row)
 {
-    QSqlTableModel *model = new CustomModelMy(tableView, QSqlDatabase::database());
+    QSqlDatabase db = QSqlDatabase::database();
+    if(!db.isOpen()){
+        tableView->setModel(new CustomModelMy(tableView));
+        return;
+    }
+
+    QSqlTableModel *model = new CustomModelMy(tableView, db);
 
     model->setEditStrategy(QSqlTableModel::OnManualSubmit);
-    model->setTable(QSqlDatabase::database().tables().at(row));
+    if(!db.tables().isEmpty()){
+        model->setTable(db.tables().at(row));
+    }
     model->select();
 
     tableView->setModel(model);
@@ -212,6 +220,9 @@ void MainWindow::refreshTreeWidget()
 {
     treeWidget->clear();
     QSqlDatabase db = QSqlDatabase::database();
+    if(!db.isOpen()){
+        return;
+    }
 
     QTreeWidgetItem *root = new QTreeWidgetItem(treeWidget);
     root->setText(0, qDBCaption(db));

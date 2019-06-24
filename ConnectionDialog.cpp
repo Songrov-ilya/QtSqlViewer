@@ -1,8 +1,10 @@
+#include <QFileDialog>
 #include "ConnectionDialog.h"
 
 ConnectionDialog::ConnectionDialog()
 {
     setWidgets();
+    setConnections();
 }
 
 void ConnectionDialog::setWidgets()
@@ -17,9 +19,16 @@ void ConnectionDialog::setWidgets()
     textLabelDriver = new QLabel("D&river", connectionGroupBox);
     textLabelUsername = new QLabel("&Username:", connectionGroupBox);
     editDatabase = new QLineEdit(connectionGroupBox);
+    QAction *actionPoints = new QAction(QIcon(":/new/IconConnection/Point.png"), "");
+    editDatabase->addAction(actionPoints, QLineEdit::TrailingPosition);
+    connect(actionPoints, &QAction::triggered, [&]()
+    {
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "/home");
+        editDatabase->setText(fileName);
+    });
     textLabeDatabaseName = new QLabel("Database Name:", connectionGroupBox);
-    editPassword = new QLineEdit(connectionGroupBox);
     editUsername = new QLineEdit(connectionGroupBox);
+    editPassword = new QLineEdit(connectionGroupBox);
     editHostname = new QLineEdit(connectionGroupBox);
     textLabelHostname = new QLabel("&Hostname:", connectionGroupBox);
     textLabelPort = new QLabel("P&ort:", connectionGroupBox);
@@ -82,6 +91,12 @@ void ConnectionDialog::setWidgets()
     QWidget::setTabOrder(okButton, cancelButton);
 
     okButton->setDefault(true);
+}
+
+void ConnectionDialog::setConnections()
+{
+    connect(okButton, &QPushButton::clicked, this, &ConnectionDialog::accept);
+    connect(cancelButton, &QPushButton::clicked, this, &ConnectionDialog::reject);
 }
 
 

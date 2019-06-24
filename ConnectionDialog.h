@@ -5,6 +5,7 @@
 
 class ConnectionDialog : public QDialog
 {
+    Q_OBJECT
 public:
     ConnectionDialog();
 
@@ -17,8 +18,8 @@ public:
     QLineEdit *editDatabase;
     QSpinBox *portSpinBox;
     QLabel *textLabeDatabaseName;
-    QLineEdit *editPassword;
     QLineEdit *editUsername;
+    QLineEdit *editPassword;
     QLineEdit *editHostname;
     QLabel *textLabelHostname;
     QLabel *textLabelPort;
@@ -32,6 +33,7 @@ public:
 
 
     void setWidgets();
+    void setConnections();
 
     QString driverName() const;
     QString databaseName() const;

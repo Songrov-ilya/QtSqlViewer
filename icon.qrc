@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/new/IconConnection">
+        <file>Point.png</file>
+    </qresource>
+</RCC>

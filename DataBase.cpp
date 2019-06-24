@@ -17,7 +17,7 @@ QSqlError DataBase::addConnection(const QString &driver, const QString &dbName, 
     static int cCount = 0;
 
     QSqlError err;
-    QSqlDatabase db = QSqlDatabase::addDatabase(driver, QString("DataName%1").arg(++cCount));
+    QSqlDatabase db = QSqlDatabase::addDatabase(driver);
     db.setDatabaseName(dbName);
     db.setHostName(host);
     db.setPort(port);
@@ -26,6 +26,7 @@ QSqlError DataBase::addConnection(const QString &driver, const QString &dbName, 
         db = QSqlDatabase();
         QSqlDatabase::removeDatabase(QString("DataName%1").arg(cCount));
     }
+    qDebug() << "Text db.open(user, passwd) "  << db.databaseName() << endl;
 
     return err;
 }
@@ -52,11 +53,25 @@ bool DataBase::openDefaultDataBase()
 
 bool DataBase::openNewDataBase()
 {
+    bool boolOpen { false };
+
     ConnectionDialog connDialog;
-    connDialog.exec();
-//    closeDataBase();
-//    bool boolOpen { addConnection("DataNameFull") };
-//    return boolOpen;
+    if(connDialog.exec() == QDialog::Accepted)
+    {
+        QSqlError err;
+        qDebug() << "Text openNewDataBase" << connDialog.driverName()<< connDialog.databaseName()<< connDialog.hostName()<<
+                connDialog.userName()<< connDialog.password()<< connDialog.port() << endl;
+
+        err = addConnection(connDialog.driverName(), connDialog.databaseName(), connDialog.hostName(),
+                      connDialog.userName(), connDialog.password(), connDialog.port());
+        if (err.type() != QSqlError::NoError) {
+            QMessageBox::warning(&connDialog, QObject::tr("Unable to open database"),
+                QObject::tr("An error occurred while opening the connection: ") + err.text());
+        }
+        boolOpen = true;
+    }
+
+    return boolOpen;
 }
 
 
@@ -72,9 +87,9 @@ void DataBase::setDefaultQuery()
     QSqlQuery query;
     query.exec("create table person (id INTEGER primary key AUTOINCREMENT, "
                "name TEXT (20), age INTEGER)");
-    query.exec("insert into person (name, age) values ('Danny', 23)");
-    query.exec("insert into person (name, age) values ('Christine', 34)");
-    query.exec("insert into person (name, age) values ('Lars', 35)");
+    query.exec("insert into person (name, age) values ('Ilya', 24)");
+    query.exec("insert into person (name, age) values ('Yarik', 21)");
+    query.exec("insert into person (name, age) values ('Anjela', 21)");
     query.exec("insert into person (name, age) values ('Roberto', 36)");
     query.exec("insert into person (name, age) values ('Maria', 36)");
 }
