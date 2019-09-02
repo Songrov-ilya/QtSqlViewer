@@ -9,6 +9,15 @@ class ConnectionDialog : public QDialog
 public:
     ConnectionDialog();
 
+    QString driverName() const;
+    QString databaseName() const;
+    QString userName() const;
+    QString password() const;
+    QString hostName() const;
+    int port() const;
+
+private:
+
     QVBoxLayout *vboxLayout;
     QGroupBox *connectionGroupBox;
     QGridLayout *gridLayout;
@@ -31,16 +40,8 @@ public:
     QPushButton *okButton;
     QPushButton *cancelButton;
 
-
     void setWidgets();
     void setConnections();
-
-    QString driverName() const;
-    QString databaseName() const;
-    QString userName() const;
-    QString password() const;
-    QString hostName() const;
-    int port() const;
 
 };
 
