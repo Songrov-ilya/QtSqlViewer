@@ -1,5 +1,4 @@
-#ifndef DATABASE_H
-#define DATABASE_H
+#pragma once
 
 #include <QSqlDatabase>
 #include <QSqlTableModel>
@@ -42,4 +41,3 @@ public:
     }
 };
 
-#endif // DATABASE_H
